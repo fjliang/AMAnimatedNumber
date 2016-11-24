@@ -25,8 +25,7 @@
 
 #import "AMAnimatedNumber.h"
 
-@implementation AMAnimatedNumber
-{
+@implementation AMAnimatedNumber {
     AMAnimateNumberDirection _direction;
     NSArray <NSString *> *_allNumbersList;
     NSArray <UILabel *> *_labelsList;
@@ -34,11 +33,9 @@
     NSString *_numbers;
 }
 
-
-- (void)setup
-{
+- (void)setup {
     if (_allNumbersList == nil) {
-        _allNumbersList = @[@"0",@"1",@"2",@"3",@"4",@"5",@"6",@"7",@"8",@"9"];
+        _allNumbersList = @[@"0", @"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9"];
     }
     if (_maskView == nil) {
         _maskView = [[UIView alloc] initWithFrame:self.bounds];
@@ -48,56 +45,52 @@
     }
 }
 
-- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated
-{
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated {
     [self setNumbers:numbers animated:animated direction:AMAnimateNumberDirectionUp];
 }
 
-- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction
-{
+- (void)setNumbers:(NSString *)numbers animated:(BOOL)animated direction:(AMAnimateNumberDirection)direction {
     _numbers = numbers;
     _direction = direction;
-    
-    
+
+
     [self setup];
-    
+
     [self setupLabels];
-    
+
     [self updateLabelsLayoutWithAnimated:animated];
 }
 
-- (void)setupLabels
-{
+- (void)setupLabels {
     for (UIView *view in _maskView.subviews) {
         [view removeFromSuperview];
     }
     if (_numbers != nil && _numbers.length > 0) {
-        
+
         _labelsList = [self generateLabels];
         CGRect frame = _maskView.frame;
         frame.size.height = _labelsList.firstObject.frame.size.height;
         _maskView.frame = frame;
-        
+
     }
 }
 
-- (NSArray *)generateLabels
-{
+- (NSArray *)generateLabels {
     NSMutableArray<UILabel *> *labelsList = [NSMutableArray array];
     for (int i = 0; i < _numbers.length; i++) {
         NSString *stringItem = [_numbers substringWithRange:NSMakeRange(i, 1)];
-        if ([self isNumberType:stringItem]) {
+        if ([self isNumberType:stringItem] && stringItem.intValue > 0) {
             NSString *text = [_allNumbersList componentsJoinedByString:@"\n"];
             UILabel *label = [self createLabels:text];
-            
+
             CGRect frame = label.frame;
             frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
-            frame.origin.y = stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
+            frame.origin.y = stringItem.integerValue * label.bounds.size.height / _allNumbersList.count;
             label.frame = frame;
             [labelsList addObject:label];
-        }else {
+        } else {
             UILabel *label = [self createLabels:stringItem];
-            
+
             CGRect frame = label.frame;
             frame.origin.x = labelsList.count > 0 ? CGRectGetMaxX(labelsList.lastObject.frame) : 0;
             frame.origin.y = label.bounds.size.height;
@@ -105,67 +98,65 @@
             [labelsList addObject:label];
         }
     }
+//    CGRect temp = self.frame;
+//    temp.size.width=CGRectGetMaxX(labelsList.lastObject.frame);
+//    self.frame = temp;
     return labelsList;
 }
 
-- (void)updateLabelsLayoutWithAnimated:(BOOL)animated
-{
+- (void)updateLabelsLayoutWithAnimated:(BOOL)animated {
     for (int i = 0; i < _numbers.length; i++) {
         NSString *stringItem = [_numbers substringWithRange:NSMakeRange(i, 1)];
         UILabel *label = _labelsList[i];
         BOOL isNumber = [self isNumberType:stringItem];
-       
-        
+
         if (animated) {
             if (_direction == AMAnimateNumberDirectionDown) {
                 CGRect frame = label.frame;
                 frame.origin.y = -label.bounds.size.height;
                 label.frame = frame;
             }
-            [UIView animateWithDuration:0.6 delay:0.1+0.02*i options:UIViewAnimationOptionCurveEaseOut animations:^{
-                
+            [UIView animateWithDuration:0.6 delay:0.1 + 0.02 * i options:UIViewAnimationOptionCurveEaseOut animations:^{
+
                 CGRect frame = label.frame;
                 if (isNumber) {
-                    frame.origin.y = -stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
-                    
-                }else {
+                    frame.origin.y = -stringItem.integerValue * label.bounds.size.height / _allNumbersList.count;
+
+                } else {
                     frame.origin.y = 0;
                 }
                 label.frame = frame;
-                
-            } completion:^(BOOL finished) {
-                
+
+            }                completion:^(BOOL finished) {
+
             }];
-        }else {
+        } else {
             CGRect frame = label.frame;
-            frame.origin.y = -stringItem.integerValue * label.bounds.size.height/_allNumbersList.count;
+            frame.origin.y = -stringItem.integerValue * label.bounds.size.height / _allNumbersList.count;
             label.frame = frame;
         }
-            
+
     }
-    
+
 }
 
-- (UILabel *)createLabels:(NSString *)title
-{
+- (UILabel *)createLabels:(NSString *)title {
     UILabel *label = [[UILabel alloc] init];
     label.backgroundColor = [UIColor clearColor];
     label.numberOfLines = 0;
     label.text = title;
-    label.font = _textFont == nil ? [UIFont systemFontOfSize:17.f]:_textFont;
-    label.textColor = _textColor == nil ? [UIColor blackColor]:_textColor;
+    label.font = _textFont == nil ? [UIFont systemFontOfSize:17.f] : _textFont;
+    label.textColor = _textColor == nil ? [UIColor blackColor] : _textColor;
     label.textAlignment = NSTextAlignmentLeft;
     [label sizeToFit];
     [_maskView addSubview:label];
     return label;
 }
 
-- (BOOL)isNumberType:(NSString *)string
-{
-    NSCharacterSet* notDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-    
-    if ([string rangeOfCharacterFromSet:notDigits].location == NSNotFound)
-    {
+- (BOOL)isNumberType:(NSString *)string {
+    NSCharacterSet *notDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+
+    if ([string rangeOfCharacterFromSet:notDigits].location == NSNotFound) {
         return YES;
     }
     return NO;
